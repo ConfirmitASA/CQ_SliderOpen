@@ -19,5 +19,11 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, 'runtime'),
 		filename: 'slider-open_bundle.js'
-	}
+	},
+	devServer: {
+		contentBase: path.join(__dirname, 'dist'),
+		compress: true,
+		port: 1234,
+		https: true,
+	},
 }
