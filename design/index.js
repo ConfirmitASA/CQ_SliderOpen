@@ -5,6 +5,7 @@ let selectSliderDirection = document.getElementById('sliderDirection');
 let scaleMin = document.getElementById('scaleMin');
 let scaleMax = document.getElementById('scaleMax');
 let scaleStart = document.getElementById('scaleStart');
+let scaleStep = document.getElementById('scaleStep');
 
 // Hides scale settings panel if ISCUSTOMSCALE = false
 let scaleSettingsDiv = document.getElementById('scaleSettings');
@@ -23,6 +24,7 @@ function setValues(settings, uiSettings) {
 	scaleMin.value = settings.sliderSettings.customScale.min;
 	scaleMax.value = settings.sliderSettings.customScale.max;
 	scaleStart.value = settings.sliderSettings.customScale.start;
+	scaleStep.value = settings.sliderSettings.customScale.step;
 }
 
 function saveChanges() {
@@ -42,7 +44,8 @@ function saveChanges() {
 				customScale: { 
 					min: parseInt(scaleMin.value),
 					max: parseInt(scaleMax.value),
-					start: parseInt(scaleStart.value)
+					start: startVal,
+					step: parseInt(scaleStep.value)
 				}
 			}
 		};
@@ -153,3 +156,4 @@ selectSliderDirection.addEventListener('input', saveChanges);
 scaleMin.addEventListener('input', saveChanges);
 scaleMax.addEventListener('input', saveChanges);
 scaleStart.addEventListener('input', saveChanges);
+scaleStep.addEventListener('input', saveChanges);
