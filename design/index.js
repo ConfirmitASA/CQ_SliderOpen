@@ -34,8 +34,8 @@ function saveChanges() {
 	if(elementsWithErrors.length > 0 || errors) {
 		showErrors(errors);
 	} else {
-		let isVerticalVal = selectSliderDirection.value == 'vertical' ? true : false;
-		
+		let isVerticalVal = selectSliderDirection.value === 'vertical';
+		let startVal = scaleStart.value === '' ? null : parseInt(scaleStart.value);
 		let settings = {
 			sliderSettings: {
 				isVertical: isVerticalVal,
