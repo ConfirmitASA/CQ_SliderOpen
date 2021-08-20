@@ -107,8 +107,8 @@ function checkValues() {
 
 	// check if the start point is inside of the Min and Max range
 	if(!!scaleStart.value) {
-		let rangeStart = -50;
-		let rangeEnd = 50;
+		let rangeStart = -100;
+		let rangeEnd = 100;
 		if(!!scaleMin.value) {
 			rangeStart = scaleMin.value;
 		}
@@ -119,6 +119,23 @@ function checkValues() {
 			let newItem = {
 				'element': scaleStart,
 				'errorText': 'Must be in the range between ' + parseInt(rangeStart) + ' and ' + parseInt(rangeEnd)
+			};
+			errorsList.push(newItem);
+		}
+	}
+
+	// check the step value is inside the Min and Max range
+	if(!!scaleStep.value) {
+		let rangeStart = 1;
+		let rangeEnd = 201;
+
+		if(!!scaleMin.value && !!scaleMax.value) {
+			rangeEnd = scaleMax.value - scaleMin.value + 1;
+		}
+		if(parseInt(scaleStep.value) < rangeStart || parseInt(scaleStep.value) > rangeEnd) {
+			let newItem = {
+				'element': scaleStep,
+				'errorText': 'Must be in the range between ' + rangeStart + ' and ' + parseInt(rangeEnd)
 			};
 			errorsList.push(newItem);
 		}
