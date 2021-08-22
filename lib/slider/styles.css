@@ -453,8 +453,8 @@
 
 /* override default styles for better labels positioning */
 
-.cf-single-slider-question--vertical .cf-single-slider-question__answer-text {
-	margin: 0;
+.cf-single-slider-question.cf-single-slider-question--vertical {
+	margin-bottom: 1em;
 }
 
 .cf-single-slider-question__labels {
@@ -475,4 +475,8 @@
 
 .cf-single-slider-question--vertical .cf-single-slider-question__label {
 	margin-top: -0.75em;
+}
+
+.cf-single-slider-question--vertical .cf-single-slider-question__answer-text {
+	margin: 0;
 }
