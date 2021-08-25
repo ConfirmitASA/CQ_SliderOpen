@@ -35,7 +35,7 @@ function saveChanges() {
 		showErrors(errors);
 	} else {
 		let isVerticalVal = selectSliderDirection.value === 'vertical';
-		let startVal = scaleStart.value === '' ? null : parseInt(scaleStart.value);
+		let startVal = isStartValueOutOfRange() ? '' : parseInt(scaleStart.value);
 		let settings = {
 			sliderSettings: {
 				isVertical: isVerticalVal,
@@ -52,6 +52,24 @@ function saveChanges() {
 		let hasError = false;
 		customQuestion.saveChanges(settings, hasError);     
 	}
+}
+
+function isStartValueOutOfRange() {
+	if(!!scaleStart.value) {
+		let rangeStart = -100;
+		let rangeEnd = 100;
+		if(!!scaleMin.value) {
+			rangeStart = scaleMin.value;
+		}
+		if(!!scaleMax.value) {
+			rangeEnd = scaleMax.value;
+		}
+		if(parseInt(scaleStart.value) < parseInt(rangeStart) || parseInt(scaleStart.value) > parseInt(rangeEnd)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function checkValues() {
@@ -100,25 +118,6 @@ function checkValues() {
 			let newItem = {
 				'element': scaleMax,
 				'errorText': 'Can\'t be less or equal than scale\'s minimum'
-			};
-			errorsList.push(newItem);
-		}
-	}
-
-	// check if the start point is inside of the Min and Max range
-	if(!!scaleStart.value) {
-		let rangeStart = -100;
-		let rangeEnd = 100;
-		if(!!scaleMin.value) {
-			rangeStart = scaleMin.value;
-		}
-		if(!!scaleMax.value) {
-			rangeEnd = scaleMax.value;
-		}
-		if(parseInt(scaleStart.value) < parseInt(rangeStart) || parseInt(scaleStart.value) > parseInt(rangeEnd)) {
-			let newItem = {
-				'element': scaleStart,
-				'errorText': 'Must be in the range between ' + parseInt(rangeStart) + ' and ' + parseInt(rangeEnd)
 			};
 			errorsList.push(newItem);
 		}
