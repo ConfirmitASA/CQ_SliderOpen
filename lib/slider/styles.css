@@ -481,3 +481,21 @@
 .cf-single-slider-question--custom.cf-single-slider-question--vertical .cf-single-slider-question__answer-text {
 	margin: 0;
 }
+
+/* additional styles from Public Responsive Layout V2 */
+.cf-single-slider-question--custom .cf-single-slider-question__answer-text {
+	margin-top: .3em;
+	margin-bottom: .3em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: pointer;
+}
+
+.cf-single-slider-question--custom .cf-single-slider-question__answer-text--selected {
+	font-weight: bold;
+}
+
+/* custom styles */
+.cf-single-slider-question--custom .hidden {
+	display: none;
+}
