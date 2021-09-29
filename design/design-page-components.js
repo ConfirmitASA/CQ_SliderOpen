@@ -41,6 +41,31 @@ function errorTooltipHide(element) {
 	}
 }
 
+/* tooltip with warning */
+function warningTooltipShow(element, message) {
+	let position = {
+		left: element.offsetLeft,
+		top: element.offsetTop
+	};
+
+	if(document.querySelectorAll('#warning--' + element.id).length == 0) {
+		let ttWarningBox = document.createElement('div');
+		ttWarningBox.id = 'warning--' + element.id;
+		ttWarningBox.classList.add('comd-tooltip');
+		ttWarningBox.classList.add('comd-tooltip--bottom');
+		ttWarningBox.classList.add('comd-tooltip--warning');
+
+		ttWarningBox.innerHTML = '<div class="comd-tooltip__arrow"></div><div class="comd-tooltip__inner"></div>';
+		document.body.appendChild(ttWarningBox);
+		ttWarningBox.style.display = 'block';
+		ttWarningBox.getElementsByClassName('comd-tooltip__inner')[0].innerHTML = message;
+		let arrPosition = ttWarningBox.offsetWidth/2 - 5 + 'px';
+		ttWarningBox.querySelectorAll('.comd-tooltip__arrow')[0].style.left = arrPosition;
+		ttWarningBox.style.top = position.top + ttWarningBox.offsetHeight/2 + 7 + 'px';
+		ttWarningBox.style.left = position.left - (ttWarningBox.offsetWidth/2 - element.offsetWidth/2) + 'px';
+	}
+}
+
 document.addEventListener('DOMContentLoaded', function(){
 	/* tooltip */
 	function tooltipToggle(el) {
@@ -52,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		});
 	}
 
-	function tooltipShow(element, error) {
+	function tooltipShow(element) {
 		let text = element.dataset.tooltipText;
 		let position = {
 				left: element.offsetLeft,
