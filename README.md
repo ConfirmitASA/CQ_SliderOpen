@@ -1,40 +1,44 @@
 
 # Custom Slider
 
-Custom Slider is a library for adding a slider to a custom question.
+Custom Slider is a library for adding a slider component to a custom question.
 
 ## Usage
 
-1) Create a SliderOpenQuestionView object
+1) Create a SliderOpenComponent object
 ```js
-new customQuestionsLibrary.SliderOpenQuestionView(question, questionViewSettings, customQuestionSettings);
+new customQuestionsLibrary.SliderOpenComponent(question, questionViewSettings, sliderSettings);
 ```
-2) Before creating a SliderOpenQuestionView object you can change slider's settings in customQuestionSettings. For instance: 
+2) Before creating a SliderOpenComponent object you can change slider's settings in customQuestionSettings. For instance: 
 
 ```js
 customQuestionSettings.sliderSettings = {
-  isVertical: true,
+  direction: 'vertical',
   isQuestionValue: true,
   isCustomScale: true,
+  containerSize: 400,
   customScale: {
-    min: -10,
-    max: 10,
-    start: 0
+      min: -10,
+      max: 10,
+      start: 0,
+      step: 2
   }
 }
 ```
 Default slider's settings are the following:
 
 ```js
- const DEFAULT_SLIDER_SETTINGS = {
-	isVertical: true,
-	isQuestionValue: true,
-	isCustomScale: true,
-	customScale: {
-		min: -10,
-		max: 10,
-		start: 0
-	}
+const DEFAULT_SLIDER_SETTINGS = {
+    direction: SLIDER_DIRECTION.horizontal,
+    isQuestionValue: true,
+    isCustomScale: true,
+    containerSize: 600,
+    customScale: {
+        min: -10,
+        max: 10,
+        start: '',
+        step: 1
+    }
 }
 ```
 
