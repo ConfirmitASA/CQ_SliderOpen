@@ -20,7 +20,7 @@ let VALIDATION_TEXTS = {
 	maximumGreater: `Can\'t be greater <br/> than ${RANGES.maximum.max}`,
 	maximumLessThanMinimum: 'Must be greater <br/> than minimum',
 	badStep: 'Max value label <br/> won\'t be visible',
-	stepNonPositive: 'Must be greater than 1'
+	stepNonPositive: 'Must be greater than zero'
 }
 
 let sliderDirectionSelect = document.getElementById('sliderDirection');
