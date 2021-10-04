@@ -48,7 +48,14 @@ function setValues(settings, uiSettings) {
 	scaleStepInput.value = settings.sliderSettings.customScale.step;
 	containerSizeInput.value = settings.sliderSettings.containerSize;
 
-	toggleBadStepWarning(false);
+	let errors = checkValues();
+	let hasError = false;
+
+	if(errors) {
+		showErrors(errors);
+		hasError = true;
+	}
+	toggleBadStepWarning(hasError);
 }
 
 function saveChanges() {
