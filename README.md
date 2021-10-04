@@ -2,6 +2,7 @@
 # Custom Slider
 
 Custom Slider is a library for adding a slider component to a custom question.
+![Slider component](https://user-images.githubusercontent.com/70640199/135821099-13736ab5-cfe0-4faf-b963-0c0da4ebdcf6.png)
 
 ## Usage
 
