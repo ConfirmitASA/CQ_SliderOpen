@@ -9,6 +9,10 @@ const RANGES = {
 	maximum: {
 		min: -100,
 		max: 100
+	},
+	sliderSize: {
+		min: 300,
+		max: 900
 	}
 }
 
@@ -20,7 +24,9 @@ let VALIDATION_TEXTS = {
 	maximumGreater: `Can\'t be greater <br/> than ${RANGES.maximum.max}`,
 	maximumLessThanMinimum: 'Must be greater <br/> than minimum',
 	badStep: 'Max value label <br/> won\'t be visible',
-	stepNonPositive: 'Must be greater than zero'
+	stepNonPositive: 'Must be greater than zero',
+	sliderSizeLess: `Can\'t be less <br/> than ${RANGES.sliderSize.min}`,
+	sliderSizeGreater: `Can\'t be greater <br/> than ${RANGES.sliderSize.max}`,
 }
 
 let sliderDirectionSelect = document.getElementById('sliderDirection');
@@ -180,6 +186,26 @@ function checkValues() {
 			let newItem = {
 				'element': scaleStepInput,
 				'errorText': VALIDATION_TEXTS.stepNonPositive
+			};
+			errorsList.push(newItem);
+		}
+	}
+
+	// check container size limits
+	if(!!containerSizeInput.value) {
+		if(parseInt(containerSizeInput.value) < RANGES.sliderSize.min) {
+			let newItem = {
+				'element': containerSizeInput,
+				'errorText': VALIDATION_TEXTS.sliderSizeLess
+			};
+			errorsList.push(newItem);
+		}
+	}
+	if(!!containerSizeInput.value) {
+		if(parseInt(containerSizeInput.value) > RANGES.sliderSize.max) {
+			let newItem = {
+				'element': containerSizeInput,
+				'errorText': VALIDATION_TEXTS.sliderSizeGreater
 			};
 			errorsList.push(newItem);
 		}
