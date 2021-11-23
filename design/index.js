@@ -67,9 +67,7 @@ function setValues(settings, uiSettings) {
 function saveChanges() {
 	removeErrors();
 	let hasError = false;
-
 	let errors = checkValues();
-	//let elementsWithErrors = document.querySelectorAll('.form-input--error');
 
 	if(errors) {
 		showErrors(errors);
