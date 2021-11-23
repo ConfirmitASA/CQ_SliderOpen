@@ -35,17 +35,17 @@
 						<div class="node-property-container">
 							<div class="node-property node-property--slidermin">
 								<label class="node-property__label" for="scaleMin">Minimum
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the minimum value for the slider. Required."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the minimum value for the slider. Must be in range between -100 and 100. Required."></div>
 								</label>
-								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMin" value="-10" step="1" required>
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMin" value="-10" min="-100" max="100" step="1" required>
 							</div>
 						</div>
 						<div class="node-property-container">
 							<div class="node-property node-property--slidermax">
 								<label class="node-property__label" for="scaleMax">Maximum
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the maximum value for the slider. Required."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the maximum value for the slider. Must be in range between -100 and 100. Required."></div>
 								</label>
-								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMax" value="10" step="1" required>
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMax" value="10" min="-100" max="100" step="1" required>
 							</div>
 						</div>
 						<div class="node-property-container">
@@ -60,10 +60,10 @@
 					<div class="node-properties">
 						<div class="node-property-container">
 							<div class="node-property node-property--slidercontainersize">
-								<label class="node-property__label" for="containerSize">Slider size
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the horizontal (vertical) slider width (height)."></div>
+								<label class="node-property__label" for="containerSize">Slider size (px)
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the horizontal (vertical) slider width (height). Must be between 300 and 900 pixels."></div>
 								</label>
-								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="containerSize" value="600" step="1">
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="containerSize" min="300" max="900" step="1">
 							</div>
 						</div>
 					</div>
