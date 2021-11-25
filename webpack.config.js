@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-	entry: './lib/slider/slider-open-builder.js',
+	entry: './lib/slider/slider-open-component.js',
 	optimization: {
 		minimize: false
 	},
