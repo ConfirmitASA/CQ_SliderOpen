@@ -1,10 +1,39 @@
-const ISCUSTOMSCALE = true; // should be always true for Open Form, for SingleForm, GridForm it should be false
+const ISCUSTOMSCALE = true; // should be true for Open Form and false for SingleForm, GridForm
 const ISQUESTIONVALUE = true;
 
-let selectSliderDirection = document.getElementById('sliderDirection');
-let scaleMin = document.getElementById('scaleMin');
-let scaleMax = document.getElementById('scaleMax');
-let scaleStart = document.getElementById('scaleStart');
+const RANGES = {
+	minimum: {
+		min: -100,
+		max: 100
+	},
+	maximum: {
+		min: -100,
+		max: 100
+	},
+	sliderSize: {
+		min: 300,
+		max: 900
+	}
+}
+
+let VALIDATION_TEXTS = {
+	required: 'Required',
+	minimumLess: `Can\'t be less <br/> than ${RANGES.minimum.min}`,
+	minimumGreater: `Can\'t be greater <br/> than ${RANGES.minimum.max}`,
+	maximumLess: `Can\'t be less <br/> than ${RANGES.maximum.min}`,
+	maximumGreater: `Can\'t be greater <br/> than ${RANGES.maximum.max}`,
+	maximumLessThanMinimum: 'Must be greater <br/> than minimum',
+	badStep: 'Max value label <br/> won\'t be visible',
+	stepNonPositive: 'Must be greater than zero',
+	sliderSizeLess: `Can\'t be less <br/> than ${RANGES.sliderSize.min}`,
+	sliderSizeGreater: `Can\'t be greater <br/> than ${RANGES.sliderSize.max}`,
+}
+
+let sliderDirectionSelect = document.getElementById('sliderDirection');
+let scaleMinInput = document.getElementById('scaleMin');
+let scaleMaxInput = document.getElementById('scaleMax');
+let scaleStepInput = document.getElementById('scaleStep');
+let containerSizeInput = document.getElementById('containerSize');
 
 // Hides scale settings panel if ISCUSTOMSCALE = false
 let scaleSettingsDiv = document.getElementById('scaleSettings');
@@ -18,54 +47,101 @@ function setValues(settings, uiSettings) {
 	if(!settings) {
 		return;
 	}
-	
-	selectSliderDirection.value = settings.sliderSettings.isVertical ? 'vertical' :  'horizontal';
-	scaleMin.value = settings.sliderSettings.customScale.min;
-	scaleMax.value = settings.sliderSettings.customScale.max;
-	scaleStart.value = settings.sliderSettings.customScale.start;
+
+	sliderDirectionSelect.value = settings.sliderSettings.direction;
+	scaleMinInput.value = settings.sliderSettings.customScale.min;
+	scaleMaxInput.value = settings.sliderSettings.customScale.max;
+	scaleStepInput.value = settings.sliderSettings.customScale.step;
+	containerSizeInput.value = settings.sliderSettings.containerSize;
+
+	let errors = checkValues();
+	let hasError = false;
+
+	if(errors) {
+		showErrors(errors);
+		hasError = true;
+	}
+	toggleBadStepWarning(hasError);
 }
 
 function saveChanges() {
-	let errors = checkValues();
-	let elementsWithErrors = document.querySelectorAll('.form-input--error');
 	removeErrors();
-	if(elementsWithErrors.length > 0 || errors) {
+	let hasError = false;
+	let errors = checkValues();
+
+	if(errors) {
 		showErrors(errors);
-	} else {
-		let isVerticalVal = selectSliderDirection.value == 'vertical' ? true : false;
-		
-		let settings = {
-			sliderSettings: {
-				isVertical: isVerticalVal,
-				isQuestionValue: ISQUESTIONVALUE,
-				isCustomScale: ISCUSTOMSCALE,
-				customScale: { 
-					min: parseInt(scaleMin.value),
-					max: parseInt(scaleMax.value),
-					start: parseInt(scaleStart.value)
-				}
+		hasError = true;
+	}
+	toggleBadStepWarning(hasError);
+
+	let settings = {
+		sliderSettings: {
+			direction: sliderDirectionSelect.value,
+			containerSize: containerSizeInput.value,
+			isQuestionValue: ISQUESTIONVALUE,
+			isCustomScale: ISCUSTOMSCALE,
+			customScale: {
+				min: parseInt(scaleMinInput.value),
+				max: parseInt(scaleMaxInput.value),
+				start: '',
+				step: parseInt(scaleStepInput.value)
 			}
-		};
-		let hasError = false;
-		customQuestion.saveChanges(settings, hasError);     
+		}
+	};
+
+	customQuestion.saveChanges(settings, hasError);
+}
+
+function toggleBadStepWarning(hasError) {
+	let isBadStep = false;
+	if(!!scaleStepInput.value) {
+		let x = (scaleMaxInput.value - scaleMinInput.value) / scaleStepInput.value;
+		isBadStep = !Number.isInteger(x);
+	}
+
+	if(isBadStep && !hasError) {
+		warningTooltipShow(scaleStepInput, VALIDATION_TEXTS.badStep);
+		scaleStepInput.classList.add('form-input--warning');
+	} else {
+		let warningTooltip = document.getElementById('warning--' + scaleStepInput.id);
+		if(!!warningTooltip) {
+			scaleStepInput.classList.remove('form-input--warning');
+			warningTooltip.outerHTML = '';
+		}
 	}
 }
 
 function checkValues() {
 	let errorsList = [];
+	//check required
+	if(!scaleMinInput.value) {
+		let newItem = {
+			'element': scaleMinInput,
+			'errorText': VALIDATION_TEXTS.required
+		};
+		errorsList.push(newItem);
+	}
+	if(!scaleMaxInput.value) {
+		let newItem = {
+			'element': scaleMaxInput,
+			'errorText': VALIDATION_TEXTS.required
+		};
+		errorsList.push(newItem);
+	}
 	// check scale Min setting
-	if(!!scaleMin.value) {
-		if(parseInt(scaleMin.value) < -100 || parseInt(scaleMin.value) > 99) {
-			if(parseInt(scaleMin.value) < -100) {
+	if(!!scaleMinInput.value) {
+		if(parseInt(scaleMinInput.value) < RANGES.minimum.min || parseInt(scaleMinInput.value) > RANGES.minimum.max) {
+			if(parseInt(scaleMinInput.value) < RANGES.minimum.min) {
 				let newItem = {
-					'element': scaleMin,
-					'errorText': 'Can\'t be less <br/> than -100'
+					'element': scaleMinInput,
+					'errorText': VALIDATION_TEXTS.minimumLess
 				};
 				errorsList.push(newItem);
 			} else {
 				let newItem = {
-					'element': scaleMin,
-					'errorText': 'Can\'t be more than 99'
+					'element': scaleMinInput,
+					'errorText': VALIDATION_TEXTS.minimumGreater
 				};
 				errorsList.push(newItem);
 			}
@@ -73,18 +149,18 @@ function checkValues() {
 	}
 
 	// check scale Max setting
-	if(!!scaleMax.value) {
-		if (parseInt(scaleMax.value) < -99 || parseInt(scaleMax.value) > 100) {
-			if (parseInt(scaleMax.value) < -99) {
+	if(!!scaleMaxInput.value) {
+		if (parseInt(scaleMaxInput.value) < RANGES.maximum.min || parseInt(scaleMaxInput.value) > RANGES.maximum.max) {
+			if (parseInt(scaleMaxInput.value) < RANGES.maximum.min) {
 				let newItem = {
-					'element': scaleMax,
-					'errorText': 'Can\'t be less than -99'
+					'element': scaleMaxInput,
+					'errorText': VALIDATION_TEXTS.maximumLess
 				};
 				errorsList.push(newItem);
 			} else {
 				let newItem = {
-					'element': scaleMax,
-					'errorText': 'Can\'t be more than 100'
+					'element': scaleMaxInput,
+					'errorText': VALIDATION_TEXTS.maximumGreater
 				};
 				errorsList.push(newItem);
 			}
@@ -92,30 +168,42 @@ function checkValues() {
 	}
 
 	// compare Min and Max values
-	if(!!scaleMax.value && !!scaleMin.value) {
-		if(parseInt(scaleMax.value) <= parseInt(scaleMin.value)) {
+	if(!!scaleMaxInput.value && !!scaleMinInput.value) {
+		if(parseInt(scaleMaxInput.value) <= parseInt(scaleMinInput.value)) {
 			let newItem = {
-				'element': scaleMax,
-				'errorText': 'Can\'t be less or equal than scale\'s minimum'
+				'element': scaleMaxInput,
+				'errorText': VALIDATION_TEXTS.maximumLessThanMinimum
 			};
 			errorsList.push(newItem);
 		}
 	}
 
-	// check if the start point is inside of the Min and Max range
-	if(!!scaleStart.value) {
-		let rangeStart = -50;
-		let rangeEnd = 50;
-		if(!!scaleMin.value) {
-			rangeStart = scaleMin.value;
-		}
-		if(!!scaleMax.value) {
-			rangeEnd = scaleMax.value;
-		}
-		if(parseInt(scaleStart.value) < parseInt(rangeStart) || parseInt(scaleStart.value) > parseInt(rangeEnd)) {
+	// check the step value is greater than 1
+	if(!!scaleStepInput.value) {
+		if(parseInt(scaleStepInput.value) < 1) {
 			let newItem = {
-				'element': scaleStart,
-				'errorText': 'Must be in the range between ' + parseInt(rangeStart) + ' and ' + parseInt(rangeEnd)
+				'element': scaleStepInput,
+				'errorText': VALIDATION_TEXTS.stepNonPositive
+			};
+			errorsList.push(newItem);
+		}
+	}
+
+	// check container size limits
+	if(!!containerSizeInput.value) {
+		if(parseInt(containerSizeInput.value) < RANGES.sliderSize.min) {
+			let newItem = {
+				'element': containerSizeInput,
+				'errorText': VALIDATION_TEXTS.sliderSizeLess
+			};
+			errorsList.push(newItem);
+		}
+	}
+	if(!!containerSizeInput.value) {
+		if(parseInt(containerSizeInput.value) > RANGES.sliderSize.max) {
+			let newItem = {
+				'element': containerSizeInput,
+				'errorText': VALIDATION_TEXTS.sliderSizeGreater
 			};
 			errorsList.push(newItem);
 		}
@@ -149,7 +237,12 @@ function removeErrors() {
 }
 	
 customQuestion.onSettingsReceived = setValues; 
-selectSliderDirection.addEventListener('input', saveChanges);
-scaleMin.addEventListener('input', saveChanges);
-scaleMax.addEventListener('input', saveChanges);
-scaleStart.addEventListener('input', saveChanges);
+sliderDirectionSelect.addEventListener('input', saveChanges);
+subscribeToSaveChanges();
+function subscribeToSaveChanges() {
+	var containers = [];
+	containers.push(document.querySelector('.sliderOptions'));
+	for (var c = 0; c < containers.length; c++) {
+		containers[c].addEventListener('input', saveChanges, true);
+	}
+}

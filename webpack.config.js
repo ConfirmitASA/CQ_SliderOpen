@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-	entry: './lib/slider/slider-open-question-view.js',
+	entry: './lib/slider/slider-open-component.js',
 	optimization: {
 		minimize: false
 	},
@@ -11,7 +11,11 @@ module.exports = {
 				test: /\.m?js$/,
 				exclude: /(node_modules)/,
 				use: {
-						loader: 'babel-loader'
+					loader: 'babel-loader',
+					options: {
+						presets: ['@babel/preset-env'],
+						plugins: ['@babel/plugin-proposal-class-properties']
+					}
 				}
 			}
 		]
@@ -19,5 +23,12 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, 'runtime'),
 		filename: 'slider-open_bundle.js'
-	}
+	},
+	target: ['web', 'es5'],
+	devServer: {
+		contentBase: path.join(__dirname, 'dist'),
+		compress: true,
+		port: 1234,
+		https: true,
+	},
 }

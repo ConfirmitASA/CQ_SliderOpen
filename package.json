@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "start": "parcel design/index.html runtime/slider-open_bundle.js runtime/loader.js lib/slider/styles.css --https --port 1234",
+    "start:webpack": "webpack serve --https --mode development",
+    "build:dist": "npm run build:design && npm run build:runtime && npm run build:copy-static",
+    "build:design": "parcel build design/index.html -d dist/design --no-source-maps --public-url ./",
+    "build:runtime": "parcel build runtime/slider-open_bundle.js runtime/loader.js -d dist/runtime --no-source-maps",
+    "build:copy-static": "copyfiles metadata.json design/icon.svg lib/slider/styles.css dist/"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +20,10 @@
     "@babel/preset-env": "^7.12.13",
     "babel-loader": "^8.2.2",
     "webpack": "^5.20.1",
-    "webpack-cli": "^4.5.0"
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2",
+    "parcel-bundler": "^1.12.4",
+    "copyfiles": "^2.4.1"
   },
   "dependencies": {
     "@babel/core": "^7.12.13"

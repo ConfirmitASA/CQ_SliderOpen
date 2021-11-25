@@ -552,6 +552,15 @@ input[type="color"] {
 .comd-tooltip--error .comd-tooltip__inner {
 	background-color: #eb0052;
 }
+
+.comd-tooltip--warning .comd-tooltip--bottom,
+.comd-tooltip--warning .comd-tooltip__arrow {
+	border-bottom-color: #ff986e;
+}
+
+.comd-tooltip--warning .comd-tooltip__inner {
+	background-color: #ff986e;
+}
 /* tooltip end */
 
 
@@ -734,6 +743,10 @@ input[type="color"] {
 .comd-button::-moz-focus-inner {
 	border: 0;
 	padding: 0;
+}
+
+.hidden {
+	display: none;
 }
 
 .comd-button:link,

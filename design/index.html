@@ -21,11 +21,12 @@
 						<div class="node-property-container">
 							<div class="node-property node-property--slider-direction">
 								<label class="node-property__label" for="sliderDirection">Direction
-									<div class="sd-tooltip-help" data-tooltip-text="The direction of the slider. Vertical by default."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="The direction of the slider."></div>
 								</label>
 								<select id="sliderDirection" class="form-input">
-									<option value="vertical">Vertical</option>
 									<option value="horizontal">Horizontal</option>
+									<option value="vertical">Vertical</option>
+									<option value="verticalBtt">Vertical bottom-to-top</option>
 								</select>
 							</div>
 						</div>
@@ -34,25 +35,35 @@
 						<div class="node-property-container">
 							<div class="node-property node-property--slidermin">
 								<label class="node-property__label" for="scaleMin">Minimum
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the minimum value for the slider, -10 by default. The value must be between -100 and 99."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the minimum value for the slider. Must be in range between -100 and 100. Required."></div>
 								</label>
-								<input type="number" class="form-input form-input--3ch checkIfNumeric" id="scaleMin">
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMin" value="-10" min="-100" max="100" step="1" required>
 							</div>
 						</div>
 						<div class="node-property-container">
 							<div class="node-property node-property--slidermax">
 								<label class="node-property__label" for="scaleMax">Maximum
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the maximum value for the slider, 10 by default. The value must be between -99 and 100."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the maximum value for the slider. Must be in range between -100 and 100. Required."></div>
 								</label>
-								<input type="number" class="form-input form-input--3ch checkIfNumeric" id="scaleMax">
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleMax" value="10" min="-100" max="100" step="1" required>
 							</div>
 						</div>
 						<div class="node-property-container">
-							<div class="node-property node-property--sliderstart">
-								<label class="node-property__label" for="scaleStart">Start point
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the slider value for the moment the media starts to play, 0 by default."></div>
+							<div class="node-property node-property--sliderstep">
+								<label class="node-property__label" for="scaleStep">Step
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the step value for the slider, 1 by default."></div>
 								</label>
-								<input type="number" class="form-input form-input--3ch checkIfNumeric" id="scaleStart">
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleStep" value="1" min="1" step="1">
+							</div>
+						</div>
+					</div>
+					<div class="node-properties">
+						<div class="node-property-container">
+							<div class="node-property node-property--slidercontainersize">
+								<label class="node-property__label" for="containerSize">Slider size (px)
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the horizontal (vertical) slider width (height). Must be between 300 and 900 pixels."></div>
+								</label>
+								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="containerSize" min="300" max="900" step="1">
 							</div>
 						</div>
 					</div>
