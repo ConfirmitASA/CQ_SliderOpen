@@ -23,6 +23,14 @@ var DEFAULT_SLIDER_SETTINGS = {
     max: 10,
     start: '',
     step: 1
+  },
+  otherSettings: {
+    useImageSlider: false,
+    imageSize: 80,
+    handleImage: '',
+    endImage: '',
+    leftLabelText: {},
+    rightLabelText: {}
   }
 };
 
@@ -154,17 +162,57 @@ function slider_open_renderer_createClass(Constructor, protoProps, staticProps) 
 
 
 var SliderOpenRenderer = /*#__PURE__*/function () {
-  function SliderOpenRenderer(sliderId, sliderContainer, sliderValues, sliderSettings) {
+  function SliderOpenRenderer(sliderId, container, sliderValues, sliderSettings) {
     slider_open_renderer_classCallCheck(this, SliderOpenRenderer);
 
     this.id = sliderId;
-    this.container = sliderContainer;
+    this.container = container;
     this.values = sliderSettings.isRtl && sliderSettings.direction === SLIDER_DIRECTION.horizontal ? sliderValues.slice().reverse() : sliderValues;
     this.valuesWithStep = this.getValuesWithStep(sliderSettings.customScale.min, sliderSettings.customScale.max, sliderSettings.customScale.step);
     this.settings = sliderSettings;
+    this.handleSize = parseInt(sliderSettings.otherSettings.imageSize); //in px
+
+    this.trackAreaWidth = 4; //in px
+
+    this.currentLanguage = String(Confirmit.page.surveyInfo.language);
   }
 
   slider_open_renderer_createClass(SliderOpenRenderer, [{
+    key: "sliderContainerNode",
+    get: function get() {
+      return this.container.querySelector('.cf-single-slider-question');
+    }
+  }, {
+    key: "sliderNode",
+    get: function get() {
+      return this.container.querySelector('.cf-slider');
+    }
+  }, {
+    key: "labelsNode",
+    get: function get() {
+      return this.container.querySelector('.cf-single-slider-question__labels');
+    }
+  }, {
+    key: "trackAreaNode",
+    get: function get() {
+      return this.container.querySelector('.cf-slider__track-area');
+    }
+  }, {
+    key: "trackNode",
+    get: function get() {
+      return this.container.querySelector('.cf-slider__track');
+    }
+  }, {
+    key: "handleNode",
+    get: function get() {
+      return this.container.querySelector('.cf-slider__handle');
+    }
+  }, {
+    key: "handleNoValueNode",
+    get: function get() {
+      return this.container.querySelector('.cf-slider__no-value');
+    }
+  }, {
     key: "render",
     value: function render() {
       var sliderContainer = document.createElement('div');
@@ -178,12 +226,22 @@ var SliderOpenRenderer = /*#__PURE__*/function () {
       slider.appendChild(labels);
       var trackArea = this.createTrackArea();
       slider.appendChild(trackArea);
-      sliderContainer.appendChild(slider);
+
+      if (this.settings.otherSettings.useImageSlider && this.settings.direction === SLIDER_DIRECTION.horizontal) {
+        this.renderHorizontalImageSlider(sliderContainer, slider);
+      } else {
+        sliderContainer.appendChild(slider);
+      }
+
       this.container.appendChild(sliderContainer);
       this.setDefaultStylesIfNeeded(this.container);
 
       if (this.settings.direction === SLIDER_DIRECTION.horizontal) {
         this.setHorizontalSliderLabelMargins(labels.querySelectorAll('li'));
+      }
+
+      if (this.settings.otherSettings.useImageSlider && this.settings.direction === SLIDER_DIRECTION.horizontal) {
+        this.applyHorizontalImageSliderStyles();
       }
     }
   }, {
@@ -269,6 +327,75 @@ var SliderOpenRenderer = /*#__PURE__*/function () {
       answerText.innerHTML = valueText;
       label.insertAdjacentElement('beforeend', answerText);
       return label;
+    }
+  }, {
+    key: "renderHorizontalImageSlider",
+    value: function renderHorizontalImageSlider(sliderContainer, slider) {
+      sliderContainer.classList.add('cf-single-slider-question--image');
+      var wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      var leftLabel = document.createElement('div');
+      leftLabel.setAttribute('class', 'cf-slider__label cf-slider__label-left');
+
+      if (this.settings.otherSettings.leftLabelText[this.currentLanguage] !== undefined) {
+        leftLabel.innerHTML = this.settings.otherSettings.leftLabelText[this.currentLanguage];
+      }
+
+      var rightLabel = document.createElement('div');
+      rightLabel.setAttribute('class', 'cf-slider__label cf-slider__label-right');
+
+      if (this.settings.otherSettings.rightLabelText[this.currentLanguage] !== undefined) {
+        rightLabel.innerHTML = this.settings.otherSettings.rightLabelText[this.currentLanguage];
+      }
+
+      var endImage = document.createElement('div');
+      endImage.setAttribute('class', 'cf-slider__end-image');
+      slider.querySelector('.cf-slider__track').insertAdjacentElement('beforeend', endImage);
+      wrapper.insertAdjacentElement('afterbegin', leftLabel);
+      wrapper.insertAdjacentElement('beforeend', slider);
+      wrapper.insertAdjacentElement('beforeend', rightLabel);
+      sliderContainer.appendChild(wrapper);
+    }
+  }, {
+    key: "applyHorizontalImageSliderStyles",
+    value: function applyHorizontalImageSliderStyles() {
+      this.labelsNode.style.display = 'none';
+      var endImage = this.sliderNode.querySelector('.cf-slider__end-image');
+      var rightLabel = this.sliderContainerNode.querySelector('.cf-slider__label-right');
+      var trackAreaNode = this.trackAreaNode;
+      var handleNode = this.handleNode;
+      var handleNoValueNode = this.handleNoValueNode;
+
+      if (this.settings.isRtl) {
+        trackAreaNode.style.marginRight = this.handleSize / 2 * 3 + 'px';
+        handleNode.style.marginRight = -this.handleSize / 2 + 'px';
+        handleNoValueNode.style.right = -this.handleSize / 2 * 3 + 'px';
+        endImage.style.marginRight = -this.handleSize / 2 + 'px';
+        rightLabel.style.paddingRight = this.handleSize / 2 + 8 + 'px';
+      } else {
+        trackAreaNode.style.marginLeft = this.handleSize / 2 * 3 + 'px';
+        handleNode.style.marginLeft = -this.handleSize / 2 + 'px';
+        handleNoValueNode.style.left = -this.handleSize / 2 * 3 + 'px';
+        endImage.style.marginLeft = -this.handleSize / 2 + 'px';
+        rightLabel.style.paddingLeft = this.handleSize / 2 + 8 + 'px';
+      }
+
+      trackAreaNode.style.width = this.handleSize + 'px';
+      trackAreaNode.style.padding = this.handleSize / 2 + this.trackAreaWidth + 'px 0';
+      handleNode.style.width = this.handleSize + 'px';
+      handleNode.style.height = this.handleSize + 'px';
+      handleNode.style.top = -this.handleSize / 2 + this.trackAreaWidth / 2 + 'px';
+      handleNode.style.backgroundImage = 'url("' + this.settings.otherSettings.handleImage + '")';
+      handleNoValueNode.style.top = -this.handleSize / 2 + this.trackAreaWidth / 2 + 'px';
+      handleNoValueNode.style.width = this.handleSize + 'px';
+      handleNoValueNode.style.height = this.handleSize + 'px';
+      endImage.style.top = -this.handleSize / 2 + this.trackAreaWidth / 2 + 'px';
+      endImage.style.width = this.handleSize + 'px';
+      endImage.style.height = this.handleSize + 'px';
+      endImage.style.backgroundImage = 'url("' + this.settings.otherSettings.endImage + '")';
+      var themeColor = window.getComputedStyle(document.querySelector('.cf-navigation-next')).getPropertyValue('background-color');
+      endImage.style.borderColor = themeColor;
+      handleNode.style.borderColor = themeColor;
     }
   }, {
     key: "setContainerSize",
@@ -1459,6 +1586,250 @@ var HorizontalSlider = /*#__PURE__*/function (_SliderBase) {
 }(SliderBase);
 
 
+;// CONCATENATED MODULE: ./lib/slider/horizontal-image-slider.js
+function horizontal_image_slider_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { horizontal_image_slider_typeof = function _typeof(obj) { return typeof obj; }; } else { horizontal_image_slider_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return horizontal_image_slider_typeof(obj); }
+
+function horizontal_image_slider_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function horizontal_image_slider_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function horizontal_image_slider_createClass(Constructor, protoProps, staticProps) { if (protoProps) horizontal_image_slider_defineProperties(Constructor.prototype, protoProps); if (staticProps) horizontal_image_slider_defineProperties(Constructor, staticProps); return Constructor; }
+
+function horizontal_image_slider_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) horizontal_image_slider_setPrototypeOf(subClass, superClass); }
+
+function horizontal_image_slider_setPrototypeOf(o, p) { horizontal_image_slider_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return horizontal_image_slider_setPrototypeOf(o, p); }
+
+function horizontal_image_slider_createSuper(Derived) { var hasNativeReflectConstruct = horizontal_image_slider_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = horizontal_image_slider_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = horizontal_image_slider_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return horizontal_image_slider_possibleConstructorReturn(this, result); }; }
+
+function horizontal_image_slider_possibleConstructorReturn(self, call) { if (call && (horizontal_image_slider_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return horizontal_image_slider_assertThisInitialized(self); }
+
+function horizontal_image_slider_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function horizontal_image_slider_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function horizontal_image_slider_getPrototypeOf(o) { horizontal_image_slider_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return horizontal_image_slider_getPrototypeOf(o); }
+
+
+
+
+
+var HorizontalImageSlider = /*#__PURE__*/function (_SliderBase) {
+  horizontal_image_slider_inherits(HorizontalImageSlider, _SliderBase);
+
+  var _super = horizontal_image_slider_createSuper(HorizontalImageSlider);
+
+  function HorizontalImageSlider() {
+    horizontal_image_slider_classCallCheck(this, HorizontalImageSlider);
+
+    return _super.apply(this, arguments);
+  }
+
+  horizontal_image_slider_createClass(HorizontalImageSlider, [{
+    key: "getTrackValueByInterval",
+    value: function getTrackValueByInterval(interval) {
+      if (interval === this.trackIntervals[0]) {
+        return 0;
+      }
+
+      if (interval === this.trackIntervals[this.trackIntervals.length - 1]) {
+        return 100;
+      }
+
+      return Utils.floor((interval[0] + interval[1]) / 2, 2);
+    }
+  }, {
+    key: "setHandleNodePosition",
+    value: function setHandleNodePosition(position) {
+      this.handleNode.style.left = position;
+    }
+  }, {
+    key: "getTrackNodeSize",
+    value: function getTrackNodeSize() {
+      return this.trackNode.offsetWidth;
+    }
+  }, {
+    key: "getHandleNodeSize",
+    value: function getHandleNodeSize() {
+      return this.handleNode.offsetWidth;
+    }
+  }, {
+    key: "getHandleNodeMargin",
+    value: function getHandleNodeMargin() {
+      return Utils.outerWidth(this.handleNode) - this.handleNode.offsetWidth;
+    }
+  }, {
+    key: "getNoValueNodeOffset",
+    value: function getNoValueNodeOffset() {
+      return Utils.getElementOffset(this.noValueNode).left;
+    }
+  }, {
+    key: "getTrackNodeOffset",
+    value: function getTrackNodeOffset() {
+      return Utils.getElementOffset(this.trackNode).left;
+    }
+  }, {
+    key: "getNoValueHandleNodePosition",
+    value: function getNoValueHandleNodePosition() {
+      return this.getNoValueNodeOffset() - this.getHandleNodeMargin() - this.getTrackNodeOffset();
+    }
+  }, {
+    key: "getMouseEventPointerPosition",
+    value: function getMouseEventPointerPosition(event) {
+      return event.pageX;
+    }
+  }, {
+    key: "getTouchEventPointerPosition",
+    value: function getTouchEventPointerPosition(event) {
+      return event.changedTouches[0].pageX;
+    }
+  }, {
+    key: "getPointerPositionOnTheTrack",
+    value: function getPointerPositionOnTheTrack(pointerPosition) {
+      return pointerPosition - this.getTrackNodeOffset();
+    }
+  }, {
+    key: "handleArrowsKeys",
+    value: function handleArrowsKeys(keyCode) {
+      switch (keyCode) {
+        case keyboard_keys.ArrowDown:
+        case keyboard_keys.ArrowLeft:
+          this.moveHandleBack();
+          break;
+
+        case keyboard_keys.ArrowUp:
+        case keyboard_keys.ArrowRight:
+          this.moveHandleForward();
+          break;
+      }
+    }
+  }]);
+
+  return HorizontalImageSlider;
+}(SliderBase);
+
+
+;// CONCATENATED MODULE: ./lib/slider/horizontal-rtl-image-slider.js
+function horizontal_rtl_image_slider_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { horizontal_rtl_image_slider_typeof = function _typeof(obj) { return typeof obj; }; } else { horizontal_rtl_image_slider_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return horizontal_rtl_image_slider_typeof(obj); }
+
+function horizontal_rtl_image_slider_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function horizontal_rtl_image_slider_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function horizontal_rtl_image_slider_createClass(Constructor, protoProps, staticProps) { if (protoProps) horizontal_rtl_image_slider_defineProperties(Constructor.prototype, protoProps); if (staticProps) horizontal_rtl_image_slider_defineProperties(Constructor, staticProps); return Constructor; }
+
+function horizontal_rtl_image_slider_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) horizontal_rtl_image_slider_setPrototypeOf(subClass, superClass); }
+
+function horizontal_rtl_image_slider_setPrototypeOf(o, p) { horizontal_rtl_image_slider_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return horizontal_rtl_image_slider_setPrototypeOf(o, p); }
+
+function horizontal_rtl_image_slider_createSuper(Derived) { var hasNativeReflectConstruct = horizontal_rtl_image_slider_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = horizontal_rtl_image_slider_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = horizontal_rtl_image_slider_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return horizontal_rtl_image_slider_possibleConstructorReturn(this, result); }; }
+
+function horizontal_rtl_image_slider_possibleConstructorReturn(self, call) { if (call && (horizontal_rtl_image_slider_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return horizontal_rtl_image_slider_assertThisInitialized(self); }
+
+function horizontal_rtl_image_slider_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function horizontal_rtl_image_slider_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function horizontal_rtl_image_slider_getPrototypeOf(o) { horizontal_rtl_image_slider_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return horizontal_rtl_image_slider_getPrototypeOf(o); }
+
+
+
+
+
+var HorizontalRtlImageSlider = /*#__PURE__*/function (_SliderBase) {
+  horizontal_rtl_image_slider_inherits(HorizontalRtlImageSlider, _SliderBase);
+
+  var _super = horizontal_rtl_image_slider_createSuper(HorizontalRtlImageSlider);
+
+  function HorizontalRtlImageSlider() {
+    horizontal_rtl_image_slider_classCallCheck(this, HorizontalRtlImageSlider);
+
+    return _super.apply(this, arguments);
+  }
+
+  horizontal_rtl_image_slider_createClass(HorizontalRtlImageSlider, [{
+    key: "getTrackValueByInterval",
+    value: function getTrackValueByInterval(interval) {
+      if (interval === this.trackIntervals[0]) {
+        return 0;
+      }
+
+      if (interval === this.trackIntervals[this.trackIntervals.length - 1]) {
+        return 100;
+      }
+
+      return Utils.floor((interval[0] + interval[1]) / 2, 2);
+    }
+  }, {
+    key: "setHandleNodePosition",
+    value: function setHandleNodePosition(position) {
+      this.handleNode.style.right = position;
+    }
+  }, {
+    key: "getTrackNodeSize",
+    value: function getTrackNodeSize() {
+      return this.trackNode.offsetWidth;
+    }
+  }, {
+    key: "getHandleNodeSize",
+    value: function getHandleNodeSize() {
+      return this.handleNode.offsetWidth;
+    }
+  }, {
+    key: "getHandleNodeMargin",
+    value: function getHandleNodeMargin() {
+      return Utils.outerWidth(this.handleNode) - this.handleNode.offsetWidth;
+    }
+  }, {
+    key: "getNoValueNodeOffset",
+    value: function getNoValueNodeOffset() {
+      return Utils.getElementOffset(this.noValueNode).left + this.noValueNode.offsetWidth;
+    }
+  }, {
+    key: "getTrackNodeOffset",
+    value: function getTrackNodeOffset() {
+      return Utils.getElementOffset(this.trackNode).left + this.trackNode.offsetWidth;
+    }
+  }, {
+    key: "getNoValueHandleNodePosition",
+    value: function getNoValueHandleNodePosition() {
+      return this.getTrackNodeOffset() - (this.getNoValueNodeOffset() + this.getHandleNodeMargin());
+    }
+  }, {
+    key: "getMouseEventPointerPosition",
+    value: function getMouseEventPointerPosition(event) {
+      return event.pageX;
+    }
+  }, {
+    key: "getTouchEventPointerPosition",
+    value: function getTouchEventPointerPosition(event) {
+      return event.changedTouches[0].pageX;
+    }
+  }, {
+    key: "getPointerPositionOnTheTrack",
+    value: function getPointerPositionOnTheTrack(pointerPosition) {
+      return this.getTrackNodeOffset() - pointerPosition;
+    }
+  }, {
+    key: "handleArrowsKeys",
+    value: function handleArrowsKeys(keyCode) {
+      switch (keyCode) {
+        case keyboard_keys.ArrowDown:
+        case keyboard_keys.ArrowRight:
+          this.moveHandleBack();
+          break;
+
+        case keyboard_keys.ArrowUp:
+        case keyboard_keys.ArrowLeft:
+          this.moveHandleForward();
+          break;
+      }
+    }
+  }]);
+
+  return HorizontalRtlImageSlider;
+}(SliderBase);
+
+
 ;// CONCATENATED MODULE: ./lib/slider/slider-open-component.js
 function slider_open_component_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { slider_open_component_typeof = function _typeof(obj) { return typeof obj; }; } else { slider_open_component_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return slider_open_component_typeof(obj); }
 
@@ -1467,6 +1838,8 @@ function slider_open_component_classCallCheck(instance, Constructor) { if (!(ins
 function slider_open_component_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function slider_open_component_createClass(Constructor, protoProps, staticProps) { if (protoProps) slider_open_component_defineProperties(Constructor.prototype, protoProps); if (staticProps) slider_open_component_defineProperties(Constructor, staticProps); return Constructor; }
+
+
 
 
 
@@ -1639,7 +2012,15 @@ var SliderOpenComponent = /*#__PURE__*/function () {
       switch (this.sliderSettings.direction) {
         case SLIDER_DIRECTION.horizontal:
           if (this.sliderSettings.isRtl) {
+            if (this.sliderSettings.otherSettings.useImageSlider) {
+              return new HorizontalRtlImageSlider(sliderNodeId, sliderValues, sliderValue, sliderTextValueHandler, readOnly);
+            }
+
             return new HorizontalRtlSlider(sliderNodeId, sliderValues, sliderValue, sliderTextValueHandler, readOnly);
+          }
+
+          if (this.sliderSettings.otherSettings.useImageSlider) {
+            return new HorizontalImageSlider(sliderNodeId, sliderValues, sliderValue, sliderTextValueHandler, readOnly);
           }
 
           return new HorizontalSlider(sliderNodeId, sliderValues, sliderValue, sliderTextValueHandler, readOnly);
