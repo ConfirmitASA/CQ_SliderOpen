@@ -23,17 +23,60 @@
 			errorDiv.setAttribute('class', 'cf-question__error cf-error-block cf-error-block--bottom cf-error-block--hidden');
 			errorDiv.innerHTML = '<ul class="cf-error-list" id="' + question.id + '_error_list"></ul>';
 
-			let container = document.getElementById(question.id);
+			let containerDiv = document.createElement('div');
+			containerDiv.setAttribute('id', question.id + '_content');
+			containerDiv.setAttribute('class', 'cf-question__content');
 
-			container.appendChild(textDiv);
-			container.appendChild(instructionDiv);
-			container.appendChild(errorDiv);
+			let questionContainer = document.getElementById(question.id);
 
-			let sliderComponent = new customQuestionsLibrary.SliderOpenComponent(question, questionViewSettings, sliderSettings);
-			// sliderComponent.changeEvent.on(function() {
-			// 	console.log(sliderComponent.getSliderValue());
-			// });
-			//new customQuestionsLibrary.SliderOpenComponent(question, questionViewSettings, sliderSettings);
+			questionContainer.appendChild(textDiv);
+			questionContainer.appendChild(instructionDiv);
+			questionContainer.appendChild(errorDiv);
+			questionContainer.appendChild(containerDiv);
+
+			question.validationEvent.on(showValidationResultMessages);
+
+			function showValidationResultMessages (validationResult) {
+				let questionElement = document.querySelector('#' + question.id);
+				let errorList;
+				try {
+					errorList = questionElement.getElementsByClassName("cf-error-list")[0];
+				}
+				catch {
+					console.log("Could not find error list element");
+					return;
+				}
+				clearErrorList(errorList);
+
+				let errorsCount = validationResult.errors.length;
+				if(errorsCount > 0) {
+					errorList.parentElement.classList.remove("cf-error-block--hidden");
+					validationResult.errors.forEach(error => {
+							let errorItem = createErrorListItem(error.message);
+							errorList.appendChild(errorItem);
+						}
+					);
+				}
+			}
+
+			function clearErrorList(errorList) {
+				let errorLiElement = errorList.lastElementChild;
+				while (errorLiElement) {
+					errorList.removeChild(errorLiElement);
+					errorLiElement = errorList.lastElementChild;
+				}
+				errorList.parentElement.classList.add("cf-error-block--hidden");
+			}
+
+			function createErrorListItem(message) {
+				let item = document.createElement('li');
+				item.className += "cf-error-list__item";
+				item.innerText = message;
+
+				return item;
+			}
+
+			let sliderComponent = new customQuestionsLibrary.SliderOpenComponent(question, questionViewSettings, sliderSettings, containerDiv);
 		}
 	);
 })();
