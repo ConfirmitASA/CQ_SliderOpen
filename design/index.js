@@ -13,6 +13,10 @@ const RANGES = {
 	sliderSize: {
 		min: 300,
 		max: 900
+	},
+	imageSize: {
+		min: 30,
+		max: 300
 	}
 }
 
@@ -27,6 +31,8 @@ let VALIDATION_TEXTS = {
 	stepNonPositive: 'Must be greater than zero',
 	sliderSizeLess: `Can\'t be less <br/> than ${RANGES.sliderSize.min}`,
 	sliderSizeGreater: `Can\'t be greater <br/> than ${RANGES.sliderSize.max}`,
+	imageSizeLess: `Can\'t be less <br/> than ${RANGES.imageSize.min}`,
+	imageSizeGreater: `Can\'t be greater <br/> than ${RANGES.imageSize.max}`,
 }
 
 let sliderDirectionSelect = document.getElementById('sliderDirection');
@@ -34,6 +40,12 @@ let scaleMinInput = document.getElementById('scaleMin');
 let scaleMaxInput = document.getElementById('scaleMax');
 let scaleStepInput = document.getElementById('scaleStep');
 let containerSizeInput = document.getElementById('containerSize');
+let useImageSliderInput = document.getElementById('useImageSlider');
+let imageSizeInput = document.getElementById('imageSize');
+let handleImageInput = document.getElementById('handleImage');
+let endImageInput = document.getElementById('endImage');
+let leftLabelTextInput = document.getElementById('leftLabelText');
+let rightLabelTextInput = document.getElementById('rightLabelText');
 
 // Hides scale settings panel if ISCUSTOMSCALE = false
 let scaleSettingsDiv = document.getElementById('scaleSettings');
@@ -43,16 +55,57 @@ if(ISCUSTOMSCALE) {
   scaleSettingsDiv.style.display = 'none';
 }
 
+let currentLanguage = '';
+let leftLabelTextObj = {};
+let rightLabelTextObj = {};
+
 function setValues(settings, uiSettings) {
+	currentLanguage = String(uiSettings.currentLanguage);
+
 	if(!settings) {
 		return;
 	}
 
 	sliderDirectionSelect.value = settings.sliderSettings.direction;
+	toggleUseImageSliderAccordingToChosenDirection();
 	scaleMinInput.value = settings.sliderSettings.customScale.min;
 	scaleMaxInput.value = settings.sliderSettings.customScale.max;
 	scaleStepInput.value = settings.sliderSettings.customScale.step;
 	containerSizeInput.value = settings.sliderSettings.containerSize;
+
+	if(settings.sliderSettings.hasOwnProperty('otherSettings')) {
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('useImageSlider') && settings.sliderSettings.otherSettings.useImageSlider !== undefined) {
+			useImageSliderInput.checked = settings.sliderSettings.otherSettings.useImageSlider;
+			toggleSubsectionOnUseImageSliderBoxChecked();
+		}
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('imageSize') && settings.sliderSettings.otherSettings.imageSize !== undefined) {
+			imageSizeInput.value = settings.sliderSettings.otherSettings.imageSize;
+		}
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('handleImage') && settings.sliderSettings.otherSettings.handleImage !== undefined) {
+			handleImageInput.value = settings.sliderSettings.otherSettings.handleImage;
+			loadImagePreview(handleImageInput);
+		}
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('endImage') && settings.sliderSettings.otherSettings.endImage !== undefined) {
+			endImageInput.value = settings.sliderSettings.otherSettings.endImage;
+			loadImagePreview(endImageInput);
+		}
+
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('leftLabelText')) {
+			leftLabelTextObj = settings.sliderSettings.otherSettings.leftLabelText;
+		}
+		leftLabelTextInput.value = '';
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('leftLabelText') && settings.sliderSettings.otherSettings.leftLabelText[currentLanguage] !== undefined) {
+			leftLabelTextInput.value = settings.sliderSettings.otherSettings.leftLabelText[currentLanguage];
+		}
+
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('rightLabelText')) {
+			rightLabelTextObj = settings.sliderSettings.otherSettings.rightLabelText;
+		}
+		rightLabelTextInput.value = '';
+		if(settings.sliderSettings.otherSettings.hasOwnProperty('rightLabelText') && settings.sliderSettings.otherSettings.rightLabelText[currentLanguage] !== undefined) {
+			rightLabelTextInput.value = settings.sliderSettings.otherSettings.rightLabelText[currentLanguage];
+		}
+	}
 
 	let errors = checkValues();
 	let hasError = false;
@@ -75,6 +128,9 @@ function saveChanges() {
 	}
 	toggleBadStepWarning(hasError);
 
+	leftLabelTextObj[currentLanguage] = leftLabelTextInput.value;
+	rightLabelTextObj[currentLanguage] = rightLabelTextInput.value;
+
 	let settings = {
 		sliderSettings: {
 			direction: sliderDirectionSelect.value,
@@ -86,6 +142,14 @@ function saveChanges() {
 				max: parseInt(scaleMaxInput.value),
 				start: '',
 				step: parseInt(scaleStepInput.value)
+			},
+			otherSettings: {
+				useImageSlider: useImageSliderInput.checked,
+				imageSize: parseInt(imageSizeInput.value),
+				handleImage: handleImageInput.value,
+				endImage: endImageInput.value,
+				leftLabelText: leftLabelTextObj,
+				rightLabelText: rightLabelTextObj
 			}
 		}
 	};
@@ -209,6 +273,26 @@ function checkValues() {
 		}
 	}
 
+	// check image size limits
+	if(!!imageSizeInput.value) {
+		if(parseInt(imageSizeInput.value) < RANGES.imageSize.min) {
+			let newItem = {
+				'element': imageSizeInput,
+				'errorText': VALIDATION_TEXTS.imageSizeLess
+			};
+			errorsList.push(newItem);
+		}
+	}
+	if(!!imageSizeInput.value) {
+		if(parseInt(imageSizeInput.value) > RANGES.imageSize.max) {
+			let newItem = {
+				'element': imageSizeInput,
+				'errorText': VALIDATION_TEXTS.imageSizeGreater
+			};
+			errorsList.push(newItem);
+		}
+	}
+
 	if(errorsList.length > 0) {
 		return errorsList;
 	} else {
@@ -235,13 +319,68 @@ function removeErrors() {
 		}
 	}
 }
-	
+
+function loadImagePreview(inputElement) {
+	const inputURL = inputElement.value;
+	const previewContainer = document.querySelector("#" + inputElement.id + " + img");
+	if(inputURL === '') {
+		previewContainer.removeAttribute('src');
+	} else {
+		previewContainer.setAttribute('src', inputURL);
+	}
+}
+
+function subscribeUseImageSliderCheckboxToggleSubsection() {
+	useImageSliderInput.addEventListener('change', toggleSubsectionOnUseImageSliderBoxChecked);
+}
+
+function toggleSubsectionOnUseImageSliderBoxChecked() {
+	let collapsableSection;
+	try{
+		collapsableSection = document.querySelectorAll(`.controlled-by--${useImageSliderInput.id}`)[0];
+	}
+	catch (e) {
+		console.log("Could not find collapsable section controlled by " + useImageSliderInput.id);
+		return;
+	}
+
+	if (useImageSliderInput.checked) {
+		collapsableSection.classList.remove("hidden");
+	} else {
+		collapsableSection.classList.add("hidden");
+	}
+}
+
+function toggleUseImageSliderAccordingToChosenDirection() {
+	if(sliderDirectionSelect.value !== 'horizontal') {
+		useImageSliderInput.disabled = true;
+		useImageSliderInput.checked = false;
+		useImageSliderInput.parentNode.querySelector('span').style.opacity = '0.6';
+		toggleSliderSizeAccordingToUseImageSlider();
+	} else {
+		useImageSliderInput.disabled = false;
+		useImageSliderInput.parentNode.querySelector('span').style.opacity = '1';
+	}
+}
+
+function toggleSliderSizeAccordingToUseImageSlider() {
+	if(useImageSliderInput.checked) {
+		containerSizeInput.disabled = true;
+	} else {
+		containerSizeInput.disabled = false;
+	}
+}
+
+subscribeUseImageSliderCheckboxToggleSubsection();
+sliderDirectionSelect.addEventListener('input', toggleUseImageSliderAccordingToChosenDirection);
+useImageSliderInput.addEventListener('input', toggleSliderSizeAccordingToUseImageSlider);
 customQuestion.onSettingsReceived = setValues; 
 sliderDirectionSelect.addEventListener('input', saveChanges);
 subscribeToSaveChanges();
 function subscribeToSaveChanges() {
 	var containers = [];
 	containers.push(document.querySelector('.sliderOptions'));
+	containers.push(document.querySelector('.otherOptions'));
 	for (var c = 0; c < containers.length; c++) {
 		containers[c].addEventListener('input', saveChanges, true);
 	}

@@ -51,7 +51,7 @@
 						<div class="node-property-container">
 							<div class="node-property node-property--sliderstep">
 								<label class="node-property__label" for="scaleStep">Step
-									<div class="sd-tooltip-help" data-tooltip-text="Specify the step value for the slider, 1 by default."></div>
+									<div class="sd-tooltip-help" data-tooltip-text="Specify the step value for the labels, 1 by default."></div>
 								</label>
 								<input type="number" class="form-input form-input--4ch checkIfNumeric" id="scaleStep" value="1" min="1" step="1">
 							</div>
@@ -70,6 +70,79 @@
 				</div>
 			</div>
 			<!-- End of slider options-->
+			<!-- Start of other options-->
+			<div class="node-properties-other-options otherOptions">
+				<header class="node-properties__header co-flex co-flex--justify-between co-flex--center">
+					<div class="node-properties__toggle co-flex co-flex--center">
+						<h4 class="co-text-size-normal">Other options</h4>
+						<div class="sd-tooltip-help" data-tooltip-text="Additional settings for the slider."></div>
+					</div>
+					<div class="co-flex co-flex--center">
+						<button class="collapse-button comd-icon-button comd-panel__toggle--icon-button" style="transform: rotateZ(0deg);"></button>
+					</div>
+				</header>
+				<div class="comd-panel__collapse-area">
+					<div class="node-properties">
+						<div class="node-property-container">
+							<div class="node-property node-property--use-image-slider">
+								<div class="co-toggle">
+									<input class="co-toggle__input node-property__checkbox" type="checkbox" id="useImageSlider"/>
+									<label for="useImageSlider" class="node-property__label node-property__label--checkbox">
+										<div class="icon icon-checkbox co-icon">
+										</div>
+										<span>Use slider with images</span>
+										<div class="sd-tooltip-help" data-tooltip-text="Allows your respondent to drag the handle over some image to define the overlap between the two. Only works in horizontal direction. Slider size is computed based on image size."></div>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="node-property__image-slider-settings node-property__collapse-area controlled-by--useImageSlider hidden">
+						<div class="node-properties">
+							<div class="node-property-container">
+								<div class="node-property node-property--image-size">
+									<label class="node-property__label">Image size (px)
+										<div class="sd-tooltip-help" data-tooltip-text="Specify the handle and end image size. Must be between 30 and 300 pixels. 80px by default."></div>
+									</label>
+									<input type="number" class="form-input form-input--4ch checkIfNumeric" id="imageSize" value="80" min="30" max="300" step="1">
+								</div>
+							</div>
+						</div>
+						<div class="node-properties">
+							<div class="node-property-container">
+								<div class="node-property node-property--images">
+									<label class="node-property__label">Images</label>
+									<div class="image-container">
+										<label>Handle image:</label>
+										<input class="form-input input-sm image-input" id="handleImage" >
+										<img class="image-preview">
+									</div>
+									<div class="image-container">
+										<label>End image:</label>
+										<input class="form-input input-sm image-input" id="endImage" >
+										<img class="image-preview">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="node-properties">
+							<div class="node-property-container">
+								<div class="node-property node-property--left-label">
+									<label class="node-property__label">Left label: </label>
+									<input type="text" class="form-input" id="leftLabelText">
+								</div>
+							</div>
+							<div class="node-property-container">
+								<div class="node-property node-property--right-label">
+									<label class="node-property__label">Right label: </label>
+									<input type="text" class="form-input" id="rightLabelText">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- End of other options-->
 		</div>
 		<div class="comd-tooltip comd-tooltip--right" id="tooltipBox">
 			<div class="comd-tooltip__arrow"></div>
@@ -77,6 +150,6 @@
 		</div>
 		<script src="design-page-components.js"></script>
 		<script src="custom-question-bridge.js"></script>
-		<script src="index.js"></script>
+		<script src="index.js?version=1"></script>
   </body>
 </html>
