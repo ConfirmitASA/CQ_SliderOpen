@@ -42,7 +42,7 @@
 				try {
 					errorList = questionElement.getElementsByClassName("cf-error-list")[0];
 				}
-				catch {
+				catch (e) {
 					console.log("Could not find error list element");
 					return;
 				}
@@ -51,11 +51,10 @@
 				let errorsCount = validationResult.errors.length;
 				if(errorsCount > 0) {
 					errorList.parentElement.classList.remove("cf-error-block--hidden");
-					validationResult.errors.forEach(error => {
-							let errorItem = createErrorListItem(error.message);
-							errorList.appendChild(errorItem);
-						}
-					);
+					for(let i = 0; i < validationResult.errors.length; i++) {
+						let errorItem = createErrorListItem(validationResult.errors[i].message);
+						errorList.appendChild(errorItem);
+					}
 				}
 			}
 
